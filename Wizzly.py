@@ -29,7 +29,7 @@ class BotHandler:
 
     def chat(self, message):
         text = message.text.split(' ', 1)[-1]
-        url = f'https://one-api.ir/chatgpt/?token={config.KEY_ONE_API}&action=gpt3.5-turbo&q={text}'
+        url = f'https://one-api.ir/chatgpt/?token={config('KEY_ONE_API')}&action=gpt3.5-turbo&q={text}'
         response = requests.get(url).json()
         output = response['result'][0]
         self.bot.reply_to(message, output)
@@ -37,7 +37,7 @@ class BotHandler:
     def chat_reply(self, message):
         try:
             text = message.text
-            url = (f'https://gpt.irateam.ir/api/web.php?apikey={config.KEY_IRATEAM}&type=freegpt6&question={text}'
+            url = (f'https://gpt.irateam.ir/api/web.php?apikey={config('KEY_IRATEAM')}&type=freegpt6&question={text}'
                    f'&user_id={message.from_user.id}')
             response = requests.get(url).json()
             output = response['results']['answer']
@@ -62,7 +62,7 @@ class BotHandler:
         elif message.text.startswith(('dn ', 'دانلود ')):
             sm = self.bot.reply_to(message, "<b>لطفا کمی صبر کنید... ⏳</b>", parse_mode="html")
             try:
-                insta = requests.get(f"https://one-api.ir/instagram/?token={config.KEY_ONE_API}&action=getall&link="
+                insta = requests.get(f"https://one-api.ir/instagram/?token={config('KEY_ONE_API')}&action=getall&link="
                                      f"{message.text.split()[1]}&userinfo=true").json()
                 medias = insta['result']['medias']
                 str_ch = insta['result']['caption'].replace("u0040", "@")
@@ -120,6 +120,6 @@ class BotHandler:
         self.bot.infinity_polling(skip_pending=True, restart_on_change=True)
 
 
-API_TOKEN = config.TOKEN
+API_TOKEN = config('TOKEN')
 bot_handler = BotHandler(API_TOKEN)
 bot_handler.start_bot()
