@@ -6,7 +6,7 @@ import requests
 import telebot
 from telebot.types import InputMediaVideo, InputMediaPhoto
 
-import config
+from decouple import config
 
 
 class BotHandler:
