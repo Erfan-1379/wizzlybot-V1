@@ -32,22 +32,63 @@ class BotHandler:
 
     def chat(self, message):
         text = message.text.split(' ', 1)[-1]
-        url = f'https://one-api.ir/chatgpt/?token={KEY_ONE_API}&action=gpt3.5-turbo&q={text}'
-        response = requests.get(url).json()
-        output = response['result'][0]
-        self.bot.reply_to(message, output)
+        url = 'https://api.one-api.ir/chatbot/v1/gpt4o/'
+        headers = {
+            'Authorization': f'Bearer {config.KEY_ONE_API}',
+            'Content-Type': 'application/json'
+        }
+        payload = {
+            "messages": [
+                {"role": "user", "content": text}
+            ]
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=payload)
+            response_data = response.json()
+            if response.status_code == 200:
+                output = response_data['result']
+                self.bot.reply_to(message, output)
+            else:
+                error_message = response_data.get('message', 'خطای نامشخصی رخ داده است')
+                self.bot.reply_to(message, f"خطا: {error_message}")
+        except Exception as e:
+            self.bot.send_message(message.chat.id, f"<b>Error occurred:</b> {str(e)}", parse_mode="html")
+
 
     def chat_reply(self, message):
         try:
             text = message.text
-            url = (f'https://gpt.irateam.ir/api/web.php?apikey={KEY_IRATEAM}&type=freegpt6&question={text}'
-                   f'&user_id={message.from_user.id}')
-            response = requests.get(url).json()
-            output = response['results']['answer']
-            self.bot.reply_to(message, output, parse_mode="Markdown")
+            user_id = message.chat.id
+
+            url = 'https://api.one-api.ir/chatbot/v1/gpt4o/'
+            headers = {
+                "accept": "application/json",
+                'one-api-token': f'{config.KEY_ONE_API}',
+                'Content-Type': 'application/json'
+            }
+
+            payload = [
+                {"role": "user", "content": text}
+            ]
+
+            response = requests.post(url, headers=headers, json=payload)
+            response_data = response.json()
+
+            if response.status_code == 200:
+                output = response_data.get('result', 'پاسخی یافت نشد')
+                self.bot.reply_to(message, output, parse_mode="Markdown")
+            else:
+                error_message = response_data.get('message', 'خطای نامشخصی رخ داده است')
+                self.bot.reply_to(message, f"خطا: {error_message}")
         except Exception as e:
-            self.bot.send_message(message.chat.id, f"<b>Error occurred:</b> {str(e)}", parse_mode="html",
-                                  reply_to_message_id=message.message_id)
+            self.bot.send_message(
+                message.chat.id,
+                f"<b>Error occurred:</b> {str(e)}",
+                parse_mode="html",
+                reply_to_message_id=message.message_id
+            )
+
 
     def say_hello(self, message):
         chat_id = message.chat.id
@@ -120,7 +161,10 @@ class BotHandler:
 
     def start_bot(self):
         self.handle_commands()
-        self.bot.infinity_polling(skip_pending=True, restart_on_change=True)
+        self.bot.infinity_polling(skip_pending=True
+        # , restart_on_change=True
+        )
+
 
 
 API_TOKEN = TOKEN
