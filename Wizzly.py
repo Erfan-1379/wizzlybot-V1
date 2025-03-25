@@ -34,7 +34,7 @@ class BotHandler:
         text = message.text.split(' ', 1)[-1]
         url = 'https://api.one-api.ir/chatbot/v1/gpt4o/'
         headers = {
-            'Authorization': f'Bearer {config.KEY_ONE_API}',
+            'Authorization': f'Bearer {KEY_ONE_API}',
             'Content-Type': 'application/json'
         }
         payload = {
@@ -64,7 +64,7 @@ class BotHandler:
             url = 'https://api.one-api.ir/chatbot/v1/gpt4o/'
             headers = {
                 "accept": "application/json",
-                'one-api-token': f'{config.KEY_ONE_API}',
+                'one-api-token': f'{KEY_ONE_API}',
                 'Content-Type': 'application/json'
             }
 
